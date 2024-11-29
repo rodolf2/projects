@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
-import { FaPlus } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa";
 import { db } from "../firebase.js";
 import {
   collection,
@@ -10,8 +10,7 @@ import {
   doc,
   deleteDoc,
 } from "firebase/firestore";
-import { auth } from "../firebase.js";
-import SignOut from "./SignOut.jsx";
+import { SignOut } from "./SignOut";
 
 const ListTodos = ({ user }) => {
   const [loading, setLoading] = useState(true);
@@ -20,17 +19,16 @@ const ListTodos = ({ user }) => {
 
   const fetchTodos = async () => {
     try {
-      const collectionReference = collection(db, "todos");
-      const querySnapshot = await getDocs(collectionReference);
+      const collectionRef = collection(db, "todos");
+      const querySnapshot = await getDocs(collectionRef);
       const todos = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      // console.log(todos)
       setTodos(todos);
       setLoading(false);
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
     }
   };
 
@@ -58,8 +56,8 @@ const ListTodos = ({ user }) => {
   };
 
   const handleNewTodo = async () => {
-    const collectionReference = collection(db, "todos");
-    const docRef = await addDoc(collectionReference, {
+    const collectionRef = collection(db, "todos");
+    const docRef = await addDoc(collectionRef, {
       title: newTodo,
       completed: false,
     });
@@ -72,33 +70,35 @@ const ListTodos = ({ user }) => {
   return (
     <>
       <div>
-        <h1>To Do React </h1>
-        <h3>Welcome, {user ? user.name : <SignOut />}</h3>
+        <h1>React Todo App</h1>
+        <h3>
+          Welcome, {user.displayName || user.email} | <SignOut />
+        </h3>
+
         <input
           type="text"
           value={newTodo}
-          placeholder="Add Todo"
+          placeholder="Add todo"
           onChange={(e) => setNewTodo(e.target.value)}
         />
         <button onClick={handleNewTodo}>
-          {" "}
           <FaPlus /> Add
         </button>
-
-        {todos.map((todo) => (
-          <li key={todo.id}>
-            <input
-              type="checkbox"
-              checked={todo.completed}
-              onChange={() => handleToggleTodo(todo.id, todo.completed)}
-            />
-            {todo.completed ? <s>{todo.title}</s> : todo.title}
-            <button onClick={() => handleDeleteTodo(todo.id)}>
-              {" "}
-              <MdDelete /> Delete
-            </button>
-          </li>
-        ))}
+        <ul>
+          {todos.map((todo) => (
+            <li key={todo.id}>
+              <input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => handleToggleTodo(todo.id, todo.completed)}
+              />
+              {todo.completed ? <s>{todo.title}</s> : todo.title}
+              <button onClick={() => handleDeleteTodo(todo.id)}>
+                <MdDelete /> delete
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     </>
   );

@@ -1,13 +1,15 @@
+import React from "react";
 import { signOut } from "firebase/auth";
-import { useNavigate } from "react-router";
 import { auth } from "../firebase";
+import { useNavigate } from "react-router";
 
-const SignOut = () => {
-    const navigate = useNavigate()
-    const handleSignOut = async () => {
-        await signOut(auth)
-        navigate('/SignIn')
-    }
-}
+export const SignOut = () => {
+  const navigate = useNavigate();
 
-export default SignOut
+  const handleSignOut = async () => {
+    await signOut(auth);
+    navigate("/");
+  };
+
+  return <button onClick={handleSignOut}>Logout</button>;
+};
