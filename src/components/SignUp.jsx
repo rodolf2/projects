@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 
@@ -8,9 +8,12 @@ export const SignUp = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
+  const navigate = useNavigate();
+
   const handleSignUp = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+      navigate("/");
     } catch (error) {
       setError(`Failed to signup: ${error}`);
     }
