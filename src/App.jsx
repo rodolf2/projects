@@ -1,30 +1,34 @@
-import { Component, useEffect, useState } from 'react'
-import './App.css'
-import ListTodos from './components/ListTodos';
-import { BrowserRouter, Routes, Route } from 'react-router';
-import SignIn from './components/SignIn';
-import SignUp from './components/signUp';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebase';
+import { useEffect, useState } from "react";
+import ListTodos from "./components/ListTodos";
+import { SignIn } from "./components/SignIn";
+import { SignUp } from "./components/SignUp";
+import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase";
 
-const App = () => {
-  const[user, setUser] = useState("Rodolfo e");
-  
+function App() {
+  const [user, setUser] = useState(null);
+
   useEffect(() => {
-    setUser(auth?.displayName)
-  })
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
 
-  return(
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path='/' element={user ? <ListTodos user={user} /> : <SignIn /> } />
-          <Route path='/SignIn' element={<SignIn/>} />
-          <Route path='/SignUp' element={ <SignUp/>} />
-        </Routes>
-      </BrowserRouter>
-    </>
-  )
+    return unsubscribe;
+  }, []);
+
+  return (
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={user ? <ListTodos user={user} /> : <SignIn />}
+        />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
